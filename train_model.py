@@ -15,7 +15,7 @@ from tensorflow.keras.callbacks import LearningRateScheduler
 import pandas as pd
 
 import experiment_settings
-import file_methods, plots, custom_metrics, network, data_processing, base_directories
+import file_methods, custom_metrics, network, data_processing, base_directories
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -24,7 +24,7 @@ __author__ = "Jamin K. Rader, Elizabeth A. Barnes and Noah S. Diffenbaugh"
 __version__ = "12 April 2023"
 
 ### MAKE SOME DECISIONS
-EXP_NAME_LIST = ["chosen1_245", "chosen5_245", "chosen10_245"]
+EXP_NAME_LIST = ["chosen1", "chosen5", "chosen10"]
 RETRAIN_MODELS = True
 OVERWRITE_MODEL = True
 
@@ -43,7 +43,6 @@ imp.reload(file_methods)
 imp.reload(experiment_settings)
 imp.reload(network)
 
-make_plots = False
 need_rng_seed = False
 
 for EXP_NAME in EXP_NAME_LIST:
@@ -123,7 +122,7 @@ for EXP_NAME in EXP_NAME_LIST:
 
             full_model, baseline_model, delta_model = network.compile_full_model(x_train, y_train, settings)
 
-            print('TRAINING BASELINE MODEL')
+            print('TRAINING BASE MODEL')
             network.set_trainable(delta_model, full_model, settings, False, learning_rate=settings["baseline_learning_rate"])
 
             history = full_model.fit(x_train, onehot_train, 
@@ -136,7 +135,7 @@ for EXP_NAME in EXP_NAME_LIST:
                                 )
             
             # # Then train the delta model
-            print('TRAINING DELTA MODEL')
+            print('TRAINING SHIFT FACTOR LAYERS')
             network.set_trainable(baseline_model, full_model, settings, False, learning_rate=settings["learning_rate"])
             network.set_trainable(delta_model, full_model, settings, True, learning_rate=settings["learning_rate"])
             network.set_trainable(delta_model.get_layer("delta_layers"), full_model, settings, True, learning_rate=settings["learning_rate"])
@@ -150,7 +149,7 @@ for EXP_NAME in EXP_NAME_LIST:
                                 callbacks=[early_stopping,learning_rate_scheduler],
                                 verbose=0,                        
                                 )
-            
+            print('TRAINING UNCERTAINTY SCALING FACTOR LAYERS')
             network.set_trainable(baseline_model, full_model, settings, False, learning_rate=settings["learning_rate"])
             network.set_trainable(delta_model, full_model, settings, True, learning_rate=settings["learning_rate"])
             network.set_trainable(delta_model.get_layer("delta_layers"), full_model, settings, False, learning_rate=settings["learning_rate"])

@@ -964,7 +964,7 @@ def get_settings(experiment_name):
         }
     
     # Make adjustments to the experimental settings above. Set to False if no adjustments. Useful for tuning.
-    adjust_settings = True
+    adjust_settings = False
 
     if adjust_settings:
         tunelist = ["tune1","tune5","tune10",]
@@ -1011,7 +1011,7 @@ def get_settings(experiment_name):
                 experiments[keyname + "_" + str(init_seed)]["init_seed"] = int(init_seed)
                 experiments[keyname + "_" + str(init_seed)]["n_models"] = 10
 
-        exp_dict = experiments[experiment_name]
-        exp_dict['exp_name'] = experiment_name
+    exp_dict = experiments[experiment_name]
+    exp_dict['exp_name'] = experiment_name
 
     return exp_dict
